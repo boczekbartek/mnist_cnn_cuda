@@ -7,7 +7,8 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.optimizers import Adam
 from keras.layers.normalization import BatchNormalization
 from keras.utils import np_utils
-from keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D, GlobalAveragePooling2D
+from keras.layers import (Conv2D, MaxPooling2D, ZeroPadding2D,
+                          GlobalAveragePooling2D)
 from keras.layers.advanced_activations import LeakyReLU
 from keras.preprocessing.image import ImageDataGenerator
 import logging
@@ -70,26 +71,35 @@ def get_cnn_model():
     model.add(Dense(10))
 
     model.add(Activation('softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=Adam(), metrics=['accuracy'])
 
     return model
 
 
 def main():
     batch_size = 64
+    epochs = 5
     (X_train, Y_train), (X_test, Y_test) = load_data()
+    train_size = X_train.shape[0]
+    test_size = X_test.shape[0]
+
     model = get_cnn_model()
 
-    gen = ImageDataGenerator(rotation_range=8, width_shift_range=0.08, shear_range=0.3,
-                             height_shift_range=0.08, zoom_range=0.08)
+    gen = ImageDataGenerator(rotation_range=8, width_shift_range=0.08,
+                             shear_range=0.3, height_shift_range=0.08,
+                             zoom_range=0.08)
 
     test_gen = ImageDataGenerator()
 
     train_generator = gen.flow(X_train, Y_train, batch_size=batch_size)
     test_generator = test_gen.flow(X_test, Y_test, batch_size=batch_size)
 
-    model.fit_generator(train_generator, steps_per_epoch=60000 // batch_size, epochs=5,
-                        validation_data=test_generator, validation_steps=10000 // batch_size)
+    model.fit_generator(train_generator,
+                        steps_per_epoch=train_size // batch_size,
+                        epochs=epochs,
+                        validation_data=test_generator,
+                        validation_steps=test_size // batch_size)
 
 
 if __name__ == '__main__':
