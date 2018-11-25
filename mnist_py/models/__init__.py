@@ -1,2 +1,2 @@
-from mnist_py.models.big_cnn import *
-from mnist_py.models.small_cnn import *
+from models.big_cnn import *
+from models.small_cnn import *

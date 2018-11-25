@@ -33,3 +33,7 @@
 
 # Jetbrains IDEs
 .idea/
+
+# pycashes
+mnist_py/__pycache__/
+mnist_py/models/__pycache__/
