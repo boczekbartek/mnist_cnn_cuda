@@ -1,2 +1,2 @@
-from models.big_cnn import *
-from models.small_cnn import *
+from .big_cnn import *
+from .small_cnn import *

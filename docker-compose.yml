@@ -7,8 +7,6 @@ services:
     image: mnist_cnn_cuda:${TAG}
   mnist-cpu-train:
     image: mnist_cnn_cuda:${TAG}
-    environment:
-      - PYTHONPATH=/
     volumes:
       - $HOME/.keras:/root/.keras
       - ./mnist_py:/mnist_py
