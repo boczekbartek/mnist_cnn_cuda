@@ -37,3 +37,6 @@
 # pycashes
 mnist_py/__pycache__/
 mnist_py/models/__pycache__/
+
+# models
+models_dump/
