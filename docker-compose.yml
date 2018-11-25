@@ -10,6 +10,7 @@ services:
     environment:
       - PYTHONPATH=/
     volumes:
+      - $HOME/.keras:/root/.keras
       - ./mnist_py:/mnist_py
     command: >
       python /mnist_py/train.py
