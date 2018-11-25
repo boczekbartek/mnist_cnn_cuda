@@ -2,8 +2,8 @@ import os
 import logging
 from keras.preprocessing.image import ImageDataGenerator
 
-from .data import load_mnist_data
-from .models import get_big_cnn_model, get_small_cnn_model
+from mnist_py.data import load_mnist_data
+from mnist_py.models import get_big_cnn_model, get_small_cnn_model
 
 models_initializers = {
     'big_cnn': get_big_cnn_model,

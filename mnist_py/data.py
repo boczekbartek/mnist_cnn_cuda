@@ -3,6 +3,7 @@ from keras.datasets import mnist
 
 from keras.utils import np_utils
 
+
 def load_mnist_data() -> (np.array, np.array, np.array, np.array):
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
