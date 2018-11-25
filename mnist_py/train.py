@@ -3,11 +3,12 @@ import logging
 from keras.preprocessing.image import ImageDataGenerator
 
 from data import load_mnist_data
-from models import get_big_cnn_model, get_small_cnn_model
+from models import get_big_cnn_model, get_small_cnn_model, get_basic_nn_model
 
 models_initializers = {
     'big_cnn': get_big_cnn_model,
-    'small_cnn': get_small_cnn_model
+    'small_cnn': get_small_cnn_model,
+    'basic_nn': get_basic_nn_model
 }
 
 
@@ -55,3 +56,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     main('big_cnn')
     main('small_cnn')
+    main('basic_nn')
