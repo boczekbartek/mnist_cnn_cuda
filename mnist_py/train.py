@@ -58,7 +58,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train NN models on MNIST database',
                                      formatter_class=argparse.RawTextHelpFormatter)
     models_list = "\n".join([f'* {model}' for model in models_initializers.keys()])
-    parser.add_argument('models_list', nargs='+', default=list(models_initializers.keys()),
+    parser.add_argument('models_list', nargs='*', default=list(models_initializers.keys()),
                         help=f'List of models to train. \nAvailable: \n{models_list}\n'
                         f'Architectures are defined in mnist_py/models')
     return parser.parse_args()
