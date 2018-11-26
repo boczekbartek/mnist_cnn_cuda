@@ -56,14 +56,13 @@ Models definitions are stored inside *mnist_py/models* directory.
 ## Train with docker
 All models
 ```bash
+mkdir ~/.keras # MNIST will is cached here
 docker-compose up mnist-cpu-train
 ```
 Chosen models
 ```bash
 MODELS='small_cnn' docker-compose up mnist-cpu-train
 ```
-
-
 
 # Changelog
 0.0.2
