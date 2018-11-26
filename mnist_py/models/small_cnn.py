@@ -18,12 +18,10 @@ def get_small_cnn_model():
     model = Sequential()
 
     model.add(Conv2D(32, (3, 3), input_shape=(28, 28, 1)))
-    model.add(BatchNormalization(axis=-1))
     model.add(MaxPooling2D(pool_size=(3, 3)))
     model.add(Flatten())
     # Fully connected layer
     model.add(Dense(64))
-    model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(Dropout(0.2))
     model.add(Dense(10))
