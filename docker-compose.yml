@@ -11,4 +11,4 @@ services:
       - $HOME/.keras:/root/.keras
       - ./mnist_py:/mnist_py
     command: >
-      python /mnist_py/train.py
+      python /mnist_py/train.py ${MODELS}

@@ -1,5 +1,7 @@
+#!/usr/bin/env python3.6
 import os
 import logging
+import argparse
 from keras.preprocessing.image import ImageDataGenerator
 
 from data import load_mnist_data
@@ -19,7 +21,7 @@ def create_models_dump_dir(name: str = 'models_dump'):
     return models_path
 
 
-def main(model_name: str, batch_size: int = 64, epochs: int = 5):
+def train(model_name: str, batch_size: int = 64, epochs: int = 5):
     logging.info("Loading MNIST data")
     (X_train, Y_train), (X_test, Y_test) = load_mnist_data()
     train_size = X_train.shape[0]
@@ -52,8 +54,19 @@ def main(model_name: str, batch_size: int = 64, epochs: int = 5):
     logging.info("Model saved")
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Train NN models on MNIST database',
+                                     formatter_class=argparse.RawTextHelpFormatter)
+    models_list = "\n".join([f'* {model}' for model in models_initializers.keys()])
+    parser.add_argument('models_list', nargs='+', default=list(models_initializers.keys()),
+                        help=f'List of models to train. \nAvailable: \n{models_list}\n'
+                        f'Architectures are defined in mnist_py/models')
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    main('big_cnn')
-    main('small_cnn')
-    main('basic_nn')
+
+    args = parse_args()
+    for model in args.models_list:
+        train(model)
