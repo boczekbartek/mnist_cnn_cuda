@@ -1,5 +1,5 @@
-tensorflow
-keras
-pandas
-numpy
+tensorflow-gpu
+keras==2.0.8
 matplotlib
+numpy
+h5py

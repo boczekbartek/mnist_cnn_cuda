@@ -1,16 +1,28 @@
-version: '3.7'
+version: '2.3'
 services:
+  mnist:
+    image: mnist_cnn_cuda:${TAG}
+    runtime: nvidia
+    build:
+      context: .
+      dockerfile: Dockerfile
   mnist-cpu:
+    image: mnist_cnn_cuda:${TAG}-cpu
     build:
       context: .
       dockerfile: Dockerfile-CPU
+  mnist-train:
     image: mnist_cnn_cuda:${TAG}
-  mnist-cpu-train:
-    image: mnist_cnn_cuda:${TAG}
-    environment:
-      - PYTHONPATH=/
+    runtime: nvidia
     volumes:
       - $HOME/.keras:/root/.keras
       - ./mnist_py:/mnist_py
     command: >
-      python /mnist_py/train.py
+      python3.6 /mnist_py/train.py ${MODELS}
+  mnist-cpu-train:
+    image: mnist_cnn_cuda:${TAG}-cpu
+    volumes:
+      - $HOME/.keras:/root/.keras
+      - ./mnist_py:/mnist_py
+    command: >
+      python3.6 /mnist_py/train.py ${MODELS}

@@ -1,31 +1,28 @@
-import os
+#!/usr/bin/env python3.6
 import logging
+import argparse
+import numpy as np
 from keras.preprocessing.image import ImageDataGenerator
 
-from mnist_py.data import load_mnist_data
-from mnist_py.models import get_big_cnn_model, get_small_cnn_model
+from utils import save_model, save_plots
+from data import load_mnist_data
+from models import get_big_cnn_model, get_small_cnn_model, get_basic_nn_model
 
 models_initializers = {
     'big_cnn': get_big_cnn_model,
-    'small_cnn': get_small_cnn_model
+    'small_cnn': get_small_cnn_model,
+    'basic_nn': get_basic_nn_model
 }
 
 
-def create_models_dump_dir(name: str = 'models_dump'):
-    here = os.path.abspath(os.path.dirname(__file__))
-    models_path = os.path.join(here, name)
-    os.makedirs(models_path, exist_ok=True)
-    return models_path
-
-
-def main(model_name: str, batch_size: int = 64, epochs: int = 5):
+def train(model_name: str, batch_size: int = 64, epochs: int = 5):
     logging.info("Loading MNIST data")
     (X_train, Y_train), (X_test, Y_test) = load_mnist_data()
+    num_classes = len(np.unique(Y_train, axis=0))
+    logging.info(f"Image shape: {X_train[0].shape}, number of classes: {num_classes}")
+
     train_size = X_train.shape[0]
     test_size = X_test.shape[0]
-
-    logging.info(f"Initializing model: {model_name}")
-    model = models_initializers[model_name]()
 
     logging.info("Creating images generators with augmentation.")
     gen = ImageDataGenerator(rotation_range=8, width_shift_range=0.08,
@@ -37,21 +34,35 @@ def main(model_name: str, batch_size: int = 64, epochs: int = 5):
     train_generator = gen.flow(X_train, Y_train, batch_size=batch_size)
     test_generator = test_gen.flow(X_test, Y_test, batch_size=batch_size)
 
-    logging.info("Starting model training.")
-    model.fit_generator(train_generator,
-                        steps_per_epoch=train_size // batch_size,
-                        epochs=epochs,
-                        validation_data=test_generator,
-                        validation_steps=test_size // batch_size)
+    logging.info(f"Initializing model: {model_name}")
 
-    model_name = f'model.{model_name}'
-    models_path = create_models_dump_dir()
-    logging.info(f"Saving model to {models_path}")
-    model.save(os.path.join(models_path, model_name))
-    logging.info("Model saved")
+    model = models_initializers[model_name](input_shape=X_train[0].shape,
+                                            num_classes=num_classes)
+
+    logging.info("Starting model training.")
+    history = model.fit_generator(train_generator,
+                                  steps_per_epoch=train_size // batch_size,
+                                  epochs=epochs,
+                                  validation_data=test_generator,
+                                  validation_steps=test_size // batch_size)
+    print(history)
+    save_plots(history, model_name)
+    save_model(model, model_name)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Train NN models on MNIST database',
+                                     formatter_class=argparse.RawTextHelpFormatter)
+    models_list = "\n".join([f'* {model}' for model in models_initializers.keys()])
+    parser.add_argument('models_list', nargs='*', default=list(models_initializers.keys()),
+                        help=f'List of models to train. \nAvailable: \n{models_list}\n'
+                        f'Architectures are defined in mnist_py/models')
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    main('big_cnn')
-    main('small_cnn')
+
+    args = parse_args()
+    for model in args.models_list:
+        train(model)
