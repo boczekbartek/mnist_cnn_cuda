@@ -66,6 +66,8 @@ MODELS='small_cnn' docker-compose up mnist-cpu-train
 
 # Changelog
 0.0.2
+* Plotting training progress
+* mnist_py: MLP model 
 * mnist_py: Two CNN models: bigger, more complex and smaller, basic
 * docker-compose improvements, local device keras cache use 
 * Updated README.md

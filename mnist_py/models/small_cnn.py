@@ -5,7 +5,7 @@ from keras.layers.normalization import BatchNormalization
 from keras.layers import Conv2D, MaxPooling2D
 
 
-def get_small_cnn_model():
+def get_small_cnn_model(input_shape=(28, 28, 1),num_classes=10):
     # Three steps to create a CNN
     # 1. Convolution
     # 2. Activation
@@ -17,14 +17,14 @@ def get_small_cnn_model():
     # to classify the samples
     model = Sequential()
 
-    model.add(Conv2D(32, (3, 3), input_shape=(28, 28, 1)))
+    model.add(Conv2D(32, (3, 3), input_shape=input_shape))
     model.add(MaxPooling2D(pool_size=(3, 3)))
     model.add(Flatten())
     # Fully connected layer
     model.add(Dense(64))
     model.add(Activation('relu'))
     model.add(Dropout(0.2))
-    model.add(Dense(10))
+    model.add(Dense(num_classes))
 
     model.add(Activation('softmax'))
     model.compile(loss='categorical_crossentropy',

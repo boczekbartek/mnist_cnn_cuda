@@ -1,7 +1,8 @@
 import numpy as np
 from keras.datasets import mnist
-
 from keras.utils import np_utils
+
+__all__ = ['load_mnist_data']
 
 
 def load_mnist_data() -> (np.array, np.array, np.array, np.array):
