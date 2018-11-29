@@ -40,3 +40,6 @@ mnist_py/models/__pycache__/
 
 # models
 models_dump/
+
+# figures
+*.png
