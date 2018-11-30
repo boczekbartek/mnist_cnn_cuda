@@ -33,3 +33,6 @@
 
 # Jetbrains IDEs
 .idea/
+
+# Training data
+*.gz
