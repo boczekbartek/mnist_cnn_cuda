@@ -64,7 +64,7 @@ Train one model:
 python mnist_py/train.py small_cnn
 ```
 
-Models definitions are stored inside *mnist_py/models* directory.
+Models definitions are stored inside [mnist_py/models](mnist_py/models) directory.
 
 ## Train with docker
 ### CPU
