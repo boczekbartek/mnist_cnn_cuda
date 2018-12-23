@@ -4,6 +4,8 @@
 using namespace std;
 
 int main(){
+// Prosty test weryfikujący poprawność wczytywania danych.
+
 	string images_path = "train-images.idx3-ubyte", labels_path = "train-labels.idx1-ubyte";
 	cout << "Processing starting." << endl;
 	DataContainer container(images_path, labels_path);
