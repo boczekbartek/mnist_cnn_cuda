@@ -56,10 +56,11 @@ void DataContainer::read_images(string &imageset_path){
 	labeled_images.resize(size);
 	for(int i = 0; i<size; ++i){
 		labeled_images[i].pixels.resize(height*width);
-		labeled_images[i].pixels = std::vector<unsigned char>(
+		std::vector<unsigned char> tmp = std::vector<unsigned char>(
 			buffer.begin() + 16 + (height*width)*i,
 			buffer.begin() + 16 + (height*width)*i + (height*width-1)
 		);
+		labeled_images[i].pixels = std::vector<float>(tmp.begin(), tmp.end());
 	}
 }
 

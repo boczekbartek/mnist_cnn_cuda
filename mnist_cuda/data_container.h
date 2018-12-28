@@ -9,7 +9,7 @@ struct LabeledData{
 	// Struktura opisująca jeden obraz, zawierająca także informacje
 	// o poprawnej klasyfikacji obrazu --> zmienna label.
 	unsigned int label;
-	vector<unsigned char> pixels;
+	vector<float> pixels;
 };
 
 class DataContainer{
