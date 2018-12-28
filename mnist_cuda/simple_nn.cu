@@ -40,21 +40,21 @@ struct RandomGenerator
 struct FullConnectedLayer{
   // Struktura prostej warstwy pełnopołączonej sieci neuronowej.
   thrust::device_vector<float> *weights;
-  thrust::device_vector<float> *derative_weights;
+  thrust::device_vector<float> *derivative_weights;
   thrust::device_vector<float> *outputs_no_activation;
   thrust::device_vector<float> *outputs;
-  thrust::device_vector<float> *derative_outputs;
+  thrust::device_vector<float> *derivative_outputs;
   thrust::device_vector<float> *delta;
 
   FullConnectedLayer(int input, int output){
     // Konstruktor przyjmuje rozmiar wyjścia oraz wejścia warstwy sieci neuronowej.
     // Macierz wag (o rozmiarze input*output) jest inicjalizowana losowo.
     weights = new thrust::device_vector<float>(input*output);
-    derative_weights = new thrust::device_vector<float>(input*output);
+    derivative_weights = new thrust::device_vector<float>(input*output);
     thrust::transform(weights->begin(), weights->end(), weights->begin(),
                       RandomGenerator());
     outputs = new thrust::device_vector<float>(output);
-    derative_outputs = new thrust::device_vector<float>(output);
+    derivative_outputs = new thrust::device_vector<float>(output);
     outputs_no_activation = new thrust::device_vector<float>(output);
     delta = new thrust::device_vector<float>(output);
   }
@@ -73,11 +73,11 @@ struct FullConnectedLayer{
     cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, outputs->size(), N,
                 inputs->size(), &alfa, thrust::raw_pointer_cast(delta->data()),
                 outputs->size(), thrust::raw_pointer_cast(inputs->data()),
-                inputs->size(), &beta, thrust::raw_pointer_cast(derative_weights->data()), N);
+                inputs->size(), &beta, thrust::raw_pointer_cast(derivative_weights->data()), N);
 
-    thrust::transform(derative_outputs->begin(), derative_outputs->end(),
+    thrust::transform(derivative_outputs->begin(), derivative_outputs->end(),
                       thrust::make_constant_iterator(LERNING_RATE),
-                      derative_outputs->begin(), thrust::multiplies<int>());
+                      derivative_outputs->begin(), thrust::multiplies<int>());
   }
 
   template <typename T>
@@ -92,10 +92,10 @@ struct FullConnectedLayer{
 
   template <typename T>
   void backwardPropagation(thrust::device_vector<float> *inputs, int label,
-                           T derative_activation){
+                           T derivative_activation){
       // Propagacja wsteczna dla ostatniej warstwy sieci neuronowej
       thrust::transform(outputs_no_activation->begin(), outputs_no_activation->end(),
-                        derative_outputs->begin(), derative_activation);
+                        derivative_outputs->begin(), derivative_activation);
       // Odjecie wektora prawidlowego od wektora wyjscia warstwy
       (*outputs)[label] -= 1;
       countDelta();
@@ -106,12 +106,12 @@ struct FullConnectedLayer{
   void backwardPropagation(vector<float> &inputs,
                            thrust::device_vector<float> *weights_nextlayer,
                            thrust::device_vector<float> *delta_nextlayer,
-                           T derative_activation){
+                           T derivative_activation){
     // Propagacja wsteczna dla nieostatnich (w tym przykladzie pierwszej)
     // warstw sieci neuronowej.
     thrust::device_vector<float>* d_inputs = new thrust::device_vector<float>(inputs.begin(), inputs.end());
     thrust::transform(outputs_no_activation->begin(), outputs_no_activation->end(),
-                      derative_outputs->begin(), derative_activation);
+                      derivative_outputs->begin(), derivative_activation);
     countDelta(delta_nextlayer, weights_nextlayer);
     multiplyBackward(d_inputs);
   }
@@ -119,7 +119,7 @@ struct FullConnectedLayer{
   void countDelta(){
     // Mnożenie hadamarda macierzy: (outputs - good_results) * f'(W*input)
     thrust::transform(outputs->begin(), outputs->end(),
-                      derative_outputs->begin(), delta->begin(),
+                      derivative_outputs->begin(), delta->begin(),
                       thrust::multiplies<float>());
   }
 
@@ -136,7 +136,7 @@ struct FullConnectedLayer{
   void updateWeights(){
     // Aktualizacja wartości wag. W -= dW
     thrust::transform(weights->begin(), weights->end(),
-                      derative_weights->begin(), weights->begin(),
+                      derivative_weights->begin(), weights->begin(),
                       thrust::minus<float>());
   }
 };
@@ -163,11 +163,11 @@ struct softmaxForward
     }
 };
 
-struct softmaxDerative
+struct softmaxderivative
 {
     float sum_exp;
 
-    softmaxDerative(thrust::device_vector<float> *outputs){
+    softmaxderivative(thrust::device_vector<float> *outputs){
       sum_exp = thrust::transform_reduce(outputs->begin(), outputs->end(),
                                          expf_functor(), 0.0, thrust::plus<float>());
     }
@@ -177,7 +177,7 @@ struct softmaxDerative
     }
 };
 
-struct tangensHDerative
+struct tangensHderivative
 {
     __host__ __device__ float operator()(float x){
       return 1 - tanhf(x)*tanhf(x);
@@ -200,10 +200,10 @@ void single_backward_propagate(std::vector<float> inputs, int label){
   // 'Optymalniejsze' obliczenie roznicy wektora wyjściowego od prawidłowej predykacji.
   // W "prawidłowym" wektorze wszystkie skalary oprócz tego występujacego na pozycji
   // label są zerowe.
-  softmaxDerative softmax_derative = softmaxDerative(fc2->outputs);
-  tangensHDerative tanhf_derative = tangensHDerative();
-  fc2->backwardPropagation(fc1->outputs, label, softmax_derative);
-  fc1->backwardPropagation(inputs, fc2->weights, fc2->delta, tanhf_derative);
+  softmaxderivative softmax_derivative = softmaxderivative(fc2->outputs);
+  tangensHderivative tanhf_derivative = tangensHderivative();
+  fc2->backwardPropagation(fc1->outputs, label, softmax_derivative);
+  fc1->backwardPropagation(inputs, fc2->weights, fc2->delta, tanhf_derivative);
   fc2->updateWeights();
   fc1->updateWeights();
 }
